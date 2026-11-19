@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TwinTransition EU 2026 — Plataforma de Transformación Gemela</title>
+    <style>
+        :root { --verde: #0f766e; --azul: #1d4ed8; --oscuro: #0f172a; --fondo: #f1f5f9; --blanco: #ffffff; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--fondo); color: var(--oscuro); margin: 0; }
+        header { background: linear-gradient(90deg, var(--oscuro), var(--verde)); color: white; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; font-size: 1.4rem; }
+        header a { color: #bae6fd; text-decoration: none; font-weight: 600; margin-left: 16px; }
+        main { max-width: 1220px; margin: 24px auto; padding: 0 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .card { background: var(--blanco); border-radius: 10px; padding: 18px; box-shadow: 0 2px 8px rgba(15,23,42,0.06); border-top: 4px solid var(--verde); }
+        .card.digital { border-top-color: var(--azul); }
+        .card h3 { margin: 0 0 8px 0; font-size: 0.95rem; color: #475569; text-transform: uppercase; letter-spacing: .04em; }
+        .metric { font-size: 1.8rem; font-weight: 700; margin: 4px 0; }
+        .sub { font-size: 0.85rem; color: #64748b; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; background: #ccfbf1; color: #115e59; }
+        .badge.warn { background: #fef3c7; color: #92400e; }
+        .exports { background: var(--blanco); border-radius: 10px; padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(15,23,42,0.06); }
+        .btn { display: inline-block; background: var(--azul); color: white; padding: 9px 14px; border-radius: 6px; text-decoration: none; font-size: 0.88rem; margin: 4px 6px 4px 0; border: none; cursor: pointer; }
+        .btn.green { background: var(--verde); }
+        .forms { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; }
+        form { background: var(--blanco); padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(15,23,42,0.06); }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-top: 10px; }
+        input, select { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        pre { background: #0f172a; color: #e2e8f0; padding: 12px; border-radius: 8px; font-size: 0.8rem; overflow-x: auto; max-height: 220px; }
+    </style>
+</head>
+<body>
+<header>
+    <div>
+        <h1>TwinTransition EU 2026 — Cuadro de Mando Normativo</h1>
+        <small>{{ company.name }} ({{ company.nif }}) · {{ company.employees }} empleados</small>
+    </div>
+    <nav>
+        <a href="/docs" target="_blank">API Swagger (EDC/REST)</a>
+        <a href="/api/audit-trail" target="_blank">Verificar Auditoría SHA-256</a>
+    </nav>
+</header>
+
+<main>
+    <div class="grid">
+        <div class="card">
+            <h3>Huella de Carbono (RD 214/2025)</h3>
+            <div class="metric">{{ summary.carbon.scope1_2_market_tco2e }} tCO₂e</div>
+            <div class="sub">Location-based: {{ summary.carbon.scope1_2_location_tco2e }} tCO₂e</div>
+            <span class="badge">{{ summary.obligations.recommended_esg_standard }}</span>
+        </div>
+        <div class="card">
+            <h3>Pasivo CBAM Definitivo 2026</h3>
+            <div class="metric">{{ summary.cbam.total_cost_eur }} €</div>
+            <div class="sub">{{ summary.cbam.total_certs }} cert. · {{ summary.cbam.total_mass_t }} t importadas</div>
+            <span class="badge warn">Tenencia 50% (2027): {{ summary.cbam.holding_50pct }} cert.</span>
+        </div>
+        <div class="card">
+            <h3>Taxonomía UE (Reg. 2026/73)</h3>
+            <div class="metric">{{ summary.taxonomy.turnover.aligned_pct }}%</div>
+            <div class="sub">CapEx alineado: {{ summary.taxonomy.capex.aligned_pct }}% · OpEx: {{ summary.taxonomy.opex.aligned_pct }}%</div>
+            <span class="badge">Excluido &lt;10%: {{ summary.taxonomy.turnover.non_material_excluded_pct }}%</span>
+        </div>
+        <div class="card digital">
+            <h3>TIC Verde (EED / ISO 21031)</h3>
+            <div class="metric">PUE {{ summary.ict.pue }}</div>
+            <div class="sub">WUE: {{ summary.ict.wue }} m³/MWh · SCI: {{ summary.ict.sci }} gCO₂/u</div>
+            {% if summary.ict.waste_heat_alert %}
+                <span class="badge warn">Alerta &gt;1 MW: Valorizar calor residual</span>
+            {% else %}
+                <span class="badge">Conforme EED 2024/1364</span>
+            {% endif %}
+        </div>
+        <div class="card digital">
+            <h3>Madurez Digital EDIH (DMA)</h3>
+            <div class="metric">{{ summary.dma.overall_score }}%</div>
+            <div class="sub">Etapa {{ summary.dma.stage }} · Nivel: {{ summary.dma.level }}</div>
+            <span class="badge">DNSH 6 Objetivos: {{ "APTO" if summary.dnsh_ok else "REVISAR" }}</span>
+        </div>
+    </div>
+
+    <div class="exports">
+        <h3>Reportes Legibles por Máquina y Paquetes de Subvención</h3>
+        <a class="btn green" href="/api/export/{{ company.id }}/vsme" target="_blank">Exportar VSME / XBRL-Ready (JSON)</a>
+        <a class="btn green" href="/api/export/{{ company.id }}/cbam" target="_blank">Declaración CBAM (JSON)</a>
+        {% if summary.first_dpp_id %}
+        <a class="btn green" href="/api/export/dpp/{{ summary.first_dpp_id }}/jsonld" target="_blank">Pasaporte Digital DPP (JSON-LD)</a>
+        {% endif %}
+        <a class="btn" href="/api/export/sbom/cyclonedx" target="_blank">SBOM CycloneDX 1.5 (CRA)</a>
+        <a class="btn" href="/api/export/{{ company.id }}/dma/csv" target="_blank">EDIH DMA (CSV)</a>
+        <a class="btn" href="/api/export/{{ company.id }}/portability" target="_blank">Portabilidad Data Act / RGPD</a>
+    </div>
+
+    <div class="forms">
+        <form id="carbonForm">
+            <h3>+ Registrar Consumo (Motor Huella MITECO)</h3>
+            <label>Año del consumo</label>
+            <input type="number" name="reporting_year" value="2025" min="2024" max="2026">
+            <label>Alcance (1, 2 o 3)</label>
+            <select name="scope"><option value="1">Alcance 1</option><option value="2" selected>Alcance 2</option><option value="3">Alcance 3</option></select>
+            <label>Actividad (Factores MITECO)</label>
+            <select name="activity_key">
+                <option value="electricidad_mix_es_kwh">Electricidad Mix ES (kWh)</option>
+                <option value="gas_natural_kwh">Gas Natural (kWh)</option>
+                <option value="gasoleo_diesel_litro">Gasóleo / Diésel (litros)</option>
+                <option value="vehiculo_diesel_km">Flota Diésel (km)</option>
+            </select>
+            <label>Cantidad</label>
+            <input type="number" step="any" name="activity_amount" value="50000" required>
+            <label>¿Dispone de Garantía de Origen (GdO)?</label>
+            <select name="has_gdo_certificate"><option value="false">No</option><option value="true">Sí (requiere referencia)</option></select>
+            <label>Referencia factura / GdO</label>
+            <input type="text" name="evidence_ref" placeholder="Ej. GDO-CNMC-2025-099">
+            <button type="submit" class="btn green" style="margin-top:12px;">Calcular y Guardar</button>
+            <pre id="carbonOut">Listo para calcular...</pre>
+        </form>
+
+        <form id="cbamForm">
+            <h3>+ Simular / Registrar Importación CBAM 2026</h3>
+            <label>Trimestre 2026</label>
+            <select name="quarter"><option value="2026-Q1">2026-Q1 (75,36 €)</option><option value="2026-Q2">2026-Q2 (75,28 €)</option><option value="2026-Q3" selected>2026-Q3 (82,32 €)</option></select>
+            <label>Código NC / Producto</label>
+            <select name="cn_code">
+                <option value="2523 10 00">2523 10 00 - Clínker gris (Cemento)</option>
+                <option value="7207 11 14">7207 11 14 - Semiproductos Acero</option>
+                <option value="7601 10 00">7601 10 00 - Aluminio sin alear</option>
+                <option value="3102 10 19">3102 10 19 - Urea (Fertilizante)</option>
+            </select>
+            <label>Sector</label>
+            <select name="sector">
+                <option value="cemento">Cemento</option>
+                <option value="hierro_acero">Hierro y Acero</option>
+                <option value="aluminio">Aluminio</option>
+                <option value="fertilizantes">Fertilizantes (+1% recargo)</option>
+            </select>
+            <label>Masa neta importada (toneladas)</label>
+            <input type="number" step="any" name="net_mass_tonnes" value="100" required>
+            <label>¿Datos reales verificados por acreditador UE?</label>
+            <select name="is_verified_actual"><option value="false">No (aplicar recargo por defecto)</option><option value="true">Sí (sin recargo)</option></select>
+            <button type="submit" class="btn" style="margin-top:12px;">Calcular Certificados CBAM</button>
+            <pre id="cbamOut">Listo para simular...</pre>
+        </form>
+    </div>
+</main>
+
+<script>
+document.getElementById("carbonForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const body = {
+        company_id: {{ company.id }},
+        reporting_year: Number(fd.get("reporting_year")),
+        scope: Number(fd.get("scope")),
+        activity_key: fd.get("activity_key"),
+        activity_amount: Number(fd.get("activity_amount")),
+        has_gdo_certificate: fd.get("has_gdo_certificate") === "true",
+        evidence_ref: fd.get("evidence_ref") || null
+    };
+    const res = await fetch("/api/carbon", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body) });
+    document.getElementById("carbonOut").textContent = JSON.stringify(await res.json(), null, 2);
+});
+
+document.getElementById("cbamForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const body = {
+        company_id: {{ company.id }},
+        reporting_year: 2026,
+        quarter: fd.get("quarter"),
+        cn_code: fd.get("cn_code"),
+        sector: fd.get("sector"),
+        net_mass_tonnes: Number(fd.get("net_mass_tonnes")),
+        is_verified_actual: fd.get("is_verified_actual") === "true"
+    };
+    const res = await fetch("/api/cbam", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body) });
+    document.getElementById("cbamOut").textContent = JSON.stringify(await res.json(), null, 2);
+});
+</script>
+</body>
+</html>
